@@ -1,17 +1,17 @@
 <img src="https://cdn.prod.website-files.com/677c400686e724409a5a7409/6790ad949cf622dc8dcd9fe4_nextwork-logo-leather.svg" alt="NextWork" width="300" />
 
-# Launching VPC Resources
+# Creating a Private Subnet
 
-**Project Link:** [View Project](http://learn.nextwork.org/projects/aws-networks-ec2)
+**Project Link:** [View Project](http://learn.nextwork.org/projects/aws-networks-private)
 
-**Author:** Juan Hernández 
+**Author:** Juan Hernández  
 **Email:** juanm.h.t@outlook.com
 
 ---
 
-## Launching VPC Resources
+## Creating a Private Subnet
 
-![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-ec2_8ee57662)
+![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-private_afe1fdbd)
 
 ---
 
@@ -19,77 +19,55 @@
 
 ### What is Amazon VPC?
 
-Amazon VPC is a virtual private cloud that lets users launch AWS resources in a logically isolated network. It is useful because it provides enhanced security, control over network configuration, and the ability to define custom routing and subnet structures.
+Amazon VPC is a service that lets you create a private, isolated section of the AWS cloud. It is useful because it enables you to control your network configuration, enhance security, and manage traffic flow between resources. 
 
 ### How I used Amazon VPC in this project
 
-I used Amazon VPC to create a secure and isolated network environment for my resources. I set up public and private subnets, configured route tables, and used a resource map to visualize the network layout. 
+In today's project, I used Amazon VPC to create a private subnet that is isolated from the internet. This allowed me to set up a secure environment for resources that do not require direct internet access.
 
 ### One thing I didn't expect in this project was...
 
-One thing I didn't expect in this project was that there exists a faster and easier option to create VPCs.
+One thing I didn't expect in this project is that setting the CIDR block of my private subnet to 10.0.1.0/24 would keep each range completely separate from the other.
 
 ### This project took me...
 
-This project took me about 2 hours to complete.
+This project took me almost an hour.
 
 ---
 
-## Setting Up Direct VM Access
+## Private vs Public Subnets
 
-Directly accessing a virtual machine means connecting to it through its network interface, typically via SSH, using a key pair or password authentication. 
+Public subnets route traffic through an internet gateway to allow direct internet access for instances, while private subnets are isolated and only used for internal VPC communication.
 
-### SSH is a key method for directly accessing a VM
+Having private subnets are useful because they provide a secure and isolated environment for resources that do not need direct internet access. 
 
-SSH traffic means secure data transmission between a user's local machine and a remote server
+My private and public subnets cannot have the same IP address ranges. This is because overlapping IP ranges can cause routing conflicts and network instability. Each subnet must have a unique CIDR block to ensure proper communication.
 
-### To enable direct access, I set up key pairs
-
-Key pairs are sets of cryptographic keys used for secure authentication and encryption in computing. They consist of a public key and a private key, where the public key is shared and the private key is kept secret.
-
-A private key's file format means the specific type of encoding or structure used to store the cryptographic key, such as PEM or PPK. My private key's file format was PEM, which is a common format for storing SSL/TLS certificates and keys.
+![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-private_afe1fdbd)
 
 ---
 
-## Launching a public server
+## A dedicated route table
 
-I had to change my EC2 instance's networking settings by navigating to the network settings panel in the EC2 config page and selecting Edit at the right-hand corner.
+By default, my private subnet is associated with NextWork Public Route Table 
 
-![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-ec2_88727bef)
+I had to set up a new route table because the default route table has a route to an internet gateway, and having that route would make my private subnet public.
 
----
+My private subnet's dedicated route table only has one inbound and one outbound rule that allows to only direct traffic to another internal resource.
 
-## Launching a private server
-
-My private server has its own dedicated security group because it requires stricter access controls to ensure that only authorized traffic can reach it. 
-
-My private server's security group's source is NextWork Public Security Group which means only resources that are part of the NextWork Public Security Group can communicate with my instance.
-
-![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-ec2_4a9e8014)
+![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-private_b4b904b5)
 
 ---
 
-## Speeding up VPC creation
+## A new network ACL
 
-I used an alternative way to set up an Amazon VPC! This time, I selected the "VPC and more" option instead of "VPC only" when creating the VPC. This brought up a VPC resource map, which is a visual flow diagram showing all the VPC resources being created on the same page. The resource map allowed me to see and configure subnets, route tables, internet gateways, and other components all at once, without having to jump between different pages in the VPC console.
+By default, my private subnet is associated with the default ACL of my VPC.
 
-A VPC resource map is a visual flow diagram that shows the architectural layout of a VPC, including subnets, route tables, internet gateways, and other resources. It helps users quickly understand how components are connected and interact.
+I set up a dedicated network ACL for my private subnet because the default network ACL allows all traffic, which exposes my private subnet to unrestricted access from the internet or other untrusted networks.
 
-My new VPC has a CIDR block of 10.0.0.0/16. It is possible for my new VPC to have the same IPv4 CIDR block as my existing VPC because AWS VPCs are isolated from each other by default, so there won’t be any IP conflicts unless I explicitly connect them using VPC peering.
+My new network ACL has two simple rules, denying all inbound and outbound traffic, since it is a custom network ACL.
 
-![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-ec2_1cbb1b88)
-
----
-
-## Speeding up VPC creation
-
-### Tips for using the VPC resource map
-
-When determining the number of public subnets in my VPC, I only had two options: 0 or 2. This was because AWS' best practice advice ensures that if I select 2 Availability Zones, the wizard makes sure I have a public subnet in each one, providing redundancy and high availability.
-
-The set up page also offered to create NAT gateways, which are services that allow instances in private subnets to access the internet for updates and patches while blocking inbound traffic.
-
-![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-ec2_8ee57662)
+![Image](http://learn.nextwork.org/thoughtful_azure_glamorous_nectarine/uploads/aws-networks-private_1ed2cb07)
 
 ---
 
